@@ -1,0 +1,92 @@
+
+.noData {
+    white-space:pre-line;
+    background-color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    max-width: 85vw;
+    overflow: hidden;
+}
+.homeSection{
+    white-space:pre;
+    width: 100%;
+    bottom: 0vh;
+    padding:4px 0px;
+    margin-bottom: 0px;
+    margin-top: 20px;
+    position: relative;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+
+.foo {
+    height:auto;
+    white-space: pre;
+    overflow: hidden;
+    position: relative;
+    bottom: 0vh;
+    width: 100%;
+    padding: 14px 14px;
+    margin-top: 4px;
+    margin-bottom: 4px;
+    font-size: 12px;
+    font-weight: 800;
+    color: black;
+    background-color: #ffffff;
+}
+.text {
+    color: black;
+}
+
+fieldset {
+    border: 1px solid #ddd !important;
+    margin: 0 0 1.5em 0 !important;
+    padding: 10px 30px 20px 30px;
+    position: relative;
+    border-radius:4px;
+    background-color:#f5f5f5;
+}
+
+legend {
+    font-size: 16px;
+    font-weight: normal;
+    margin-bottom: 0px;
+    max-width: 300px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    padding: 5px 5px 5px 10px;
+    background-color: #777777;
+    color: white;
+}
+
+Form {
+    color: black;
+}
+
+.ui.segment {
+    color: #777777;
+}
+
+.bar {
+    width: 100vw;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: auto;
+}
+.menu {
+    width: 80%;
+    flex-grow: 1;
+}
+.groups{
+    flex: 1 1 auto;
+    width: 50%;
+    right:0;
+}
+
+.graph {
+    height: 60vh;
+    width: 100vw;
+}
