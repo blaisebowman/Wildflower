@@ -145,7 +145,7 @@ app.post("/api/sightings", (req, res, next) => {
             return;
         }
         res.json({
-            "data": rows
+            rows
         })
     });
 });

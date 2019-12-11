@@ -18,7 +18,7 @@ class MainPage extends Component {
             textBased: "",
             flowerInput: "Draperia",
             flowerReturn: 10,
-            flowerSightings: [{}]
+            flowerSightings: []
         };
         this.onHomePress = this.onHomePress.bind(this);
     }
@@ -36,20 +36,25 @@ class MainPage extends Component {
     };
 
 
-    onFlowerList = (a) => {
+    onFlowerList = () => {
         axios.post('http://localhost:8000/api/sightings',  {name: "Draperia"},
             {headers: {'Content-Type': 'application/json'}}
         )
             .then(res => {
                console.log('tried');
                console.log(res.data[0]);
-               console.log(res.data);
-               console.log(res.length);
-               for (let i = 0, v = res.data.length; i < v; i++){
-                   this.setState([this.state.flowerSightings[i].push(res.data[{i}])]);
-                   console.log(res.data[{i}]);
-               }
-               console.log(this.state.flowerSightings);
+               console.log(res.data.rows[0]);
+               console.log (res.data.rows.length);
+               console.log(res.data.rows[0].name);
+               var b = [];
+               this.setState({r1:res.data.rows[0]});
+                for (let i = 0, v = res.data.rows.length; i < v; i++){
+                    console.log(res.data.rows[i]);
+                    this.setState({flowerSightings: this.state.flowerSightings.concat(res.data.rows[i])}, () => console.log(this.state.flowerSightings));
+                }
+                console.log(this.state.flowerSightings);
+console.log(this.state.flowerSightings[0]["NAME"]
+    );
             })
             .catch(err => {
                 console.log(err);
@@ -64,14 +69,19 @@ class MainPage extends Component {
     onFlowerInsert = () => {
         //
     };
-componentDidMount() {
-    this.onFlowerList.bind('');
-}
+componentDidMount () {
+    this.onFlowerList(this);
+};
+
+
+
+//ERROR BC IT IS RUNNING IN RENDER METHOD _------- DO NOT HAVE ONCLICK RENDER
+
 
     render() {
         const options = [
             //HAVE OPTIONS POPULATE FROM THE DATABASE WITH AXIOS REQUEST
-            {key: 1, text: 'Draperia', value: 1, onClick: (this.onFlowerList(this.state.flowerInput)), selected: this.state.vis === 1}
+            {key: 1, text: 'Draperia', value: 1, onClick: (''), selected: this.state.vis === 1}
         ];
 
         const trigger = (
@@ -197,7 +207,7 @@ componentDidMount() {
                                             Flower Sightings
                                         </Grid.Column>
                                     </Grid.Row>
-                                {this.state.flowerReturn !== 0 &&
+                                {this.state.flowerSightings.length !== 0 &&
                                 <Grid.Row>
                                     <Grid.Column width={4}>
                                         Flower Spotted
@@ -213,7 +223,23 @@ componentDidMount() {
                                     </Grid.Column>
                                 </Grid.Row>
                                 }
-                                {this.state.flowerReturn >= 1 &&
+                                {this.state.flowerSightings.rows[0]["NAME") != null &&
+                                <Grid.Row>
+                                    <Grid.Column width={4}>
+                                        {this.state.flowerSightings[0]["NAME"] &&
+                                    </Grid.Column>
+                                    <Grid.Column width={4}>
+
+                                    </Grid.Column>
+                                    <Grid.Column width={4}>
+
+                                    </Grid.Column>
+                                    <Grid.Column width={4}>
+
+                                    </Grid.Column>
+                                </Grid.Row>
+                                }
+                                {this.state.flowerSightings.length >= 2 &&
                                 <Grid.Row>
                                     <Grid.Column width={4}>
 
@@ -229,7 +255,7 @@ componentDidMount() {
                                     </Grid.Column>
                                 </Grid.Row>
                                 }
-                                {this.state.flowerReturn >= 2 &&
+                                {this.state.flowerSightings.length >=3 &&
                                 <Grid.Row>
                                     <Grid.Column width={4}>
 
@@ -245,7 +271,7 @@ componentDidMount() {
                                     </Grid.Column>
                                 </Grid.Row>
                                 }
-                                {this.state.flowerReturn >=3 &&
+                                {this.state.flowerSightings.length >=4 &&
                                 <Grid.Row>
                                     <Grid.Column width={4}>
 
@@ -261,7 +287,7 @@ componentDidMount() {
                                     </Grid.Column>
                                 </Grid.Row>
                                 }
-                                {this.state.flowerReturn >=4 &&
+                                {this.state.flowerSightings.length >=5 &&
                                 <Grid.Row>
                                     <Grid.Column width={4}>
 
@@ -277,7 +303,7 @@ componentDidMount() {
                                     </Grid.Column>
                                 </Grid.Row>
                                 }
-                                {this.state.flowerReturn >=5 &&
+                                {this.state.flowerSightings.length >=6 &&
                                 <Grid.Row>
                                     <Grid.Column width={4}>
 
@@ -293,7 +319,7 @@ componentDidMount() {
                                     </Grid.Column>
                                 </Grid.Row>
                                 }
-                                {this.state.flowerReturn >=6 &&
+                                {this.state.flowerSightings.length >=7 &&
                                 <Grid.Row>
                                     <Grid.Column width={4}>
 
@@ -309,7 +335,7 @@ componentDidMount() {
                                     </Grid.Column>
                                 </Grid.Row>
                                 }
-                                {this.state.flowerReturn >=7 &&
+                                {this.state.flowerSightings.length >=8 &&
                                 <Grid.Row>
                                     <Grid.Column width={4}>
 
@@ -325,7 +351,7 @@ componentDidMount() {
                                     </Grid.Column>
                                 </Grid.Row>
                                 }
-                                {this.state.flowerReturn >=8 &&
+                                {this.state.flowerSightings.length >=9 &&
                                 <Grid.Row>
                                     <Grid.Column width={4}>
 
@@ -341,23 +367,7 @@ componentDidMount() {
                                     </Grid.Column>
                                 </Grid.Row>
                                 }
-                                {this.state.flowerReturn >=9 &&
-                                <Grid.Row>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                </Grid.Row>
-                                }
-                                {this.state.flowerReturn >=10 &&
+                                {this.state.flowerSightings.length >=10 &&
                                 <Grid.Row>
                                     <Grid.Column width={4}>
                                     </Grid.Column>
