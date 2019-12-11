@@ -134,6 +134,7 @@ app.delete("/api/user/:id", (req, res, next) => {
 //Post request to return the 10 most recent sightings of a flower.
 //If there are fewer than 10 sightings, it returns how many
 //If there are no sightings, will display err pop-up from frontend
+
 app.post("/api/sightings", (req, res, next) => {
     var name = req.body.name;
     let sql = "select * from 'sightings' where name = ? ORDER BY 'sighted' LIMIT 10";

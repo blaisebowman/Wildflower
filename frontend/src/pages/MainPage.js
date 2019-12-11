@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Header, Form, Grid, Divider, Segment, Label, Icon, Dropdown, Menu,Card, Placeholder} from 'semantic-ui-react'
+import {Button, Form, Grid, Divider, Segment, Label, Icon, Dropdown, Menu,Card, Placeholder} from 'semantic-ui-react'
 import '../pageStyles/MainPage.css'
 import axios from 'axios';
 
@@ -17,7 +17,8 @@ class MainPage extends Component {
             toView: [],
             textBased: "",
             flowerInput: "Draperia",
-            flowerReturn: 10
+            flowerReturn: 10,
+            flowerSightings: [{}]
         };
         this.onHomePress = this.onHomePress.bind(this);
     }
@@ -41,8 +42,14 @@ class MainPage extends Component {
         )
             .then(res => {
                console.log('tried');
+               console.log(res.data[0]);
                console.log(res.data);
-               console.log(res.data);
+               console.log(res.length);
+               for (let i = 0, v = res.data.length; i < v; i++){
+                   this.setState([this.state.flowerSightings[i].push(res.data[{i}])]);
+                   console.log(res.data[{i}]);
+               }
+               console.log(this.state.flowerSightings);
             })
             .catch(err => {
                 console.log(err);
@@ -57,7 +64,9 @@ class MainPage extends Component {
     onFlowerInsert = () => {
         //
     };
-
+componentDidMount() {
+    this.onFlowerList.bind('');
+}
 
     render() {
         const options = [
@@ -155,7 +164,7 @@ class MainPage extends Component {
                                 <Button color='grey'  fluid size="medium" icon labelPosition='right'
                                     /*onClick={this.addDataSet.bind(this)}*/>
                                     Update Flower
-                                    <Icon name='upload'color="white" fitted ='true'/>
+                                    <Icon name='upload' color="white" fitted ='true'/>
                                 </Button>
                             </Grid.Column>
 
@@ -163,11 +172,11 @@ class MainPage extends Component {
                     </Grid>
                 </fieldset>
                 <Grid>
-                    <Grid.Row >
+                    <Grid.Row>
                         <Grid.Column width = {4}>
                             <Menu inverted color='grey' floated="right ">
                                 <Menu.Menu fluid>
-                                    <Button.Group color='grey'>
+                                    <Button.Group color='grey' fluid>
                                         <Dropdown
                                             button
                                             simple
@@ -191,10 +200,10 @@ class MainPage extends Component {
                                 {this.state.flowerReturn !== 0 &&
                                 <Grid.Row>
                                     <Grid.Column width={4}>
-Flower Spotted
+                                        Flower Spotted
                                     </Grid.Column>
                                     <Grid.Column width={4}>
-Flower Spotter
+                                        Flower Spotter
                                     </Grid.Column>
                                     <Grid.Column width={4}>
                                         Location
@@ -213,10 +222,10 @@ Flower Spotter
 
                                     </Grid.Column>
                                     <Grid.Column width={4}>
-                                        Location
+
                                     </Grid.Column>
                                     <Grid.Column width={4}>
-                                        Date Sighted
+
                                     </Grid.Column>
                                 </Grid.Row>
                                 }
@@ -229,10 +238,10 @@ Flower Spotter
 
                                     </Grid.Column>
                                     <Grid.Column width={4}>
-                                        Location
+
                                     </Grid.Column>
                                     <Grid.Column width={4}>
-                                        Date Sighted
+
                                     </Grid.Column>
                                 </Grid.Row>
                                 }
@@ -245,10 +254,10 @@ Flower Spotter
 
                                     </Grid.Column>
                                     <Grid.Column width={4}>
-                                        Location
+
                                     </Grid.Column>
                                     <Grid.Column width={4}>
-                                        Date Sighted
+
                                     </Grid.Column>
                                 </Grid.Row>
                                 }
@@ -261,10 +270,10 @@ Flower Spotter
 
                                     </Grid.Column>
                                     <Grid.Column width={4}>
-                                        Location
+
                                     </Grid.Column>
                                     <Grid.Column width={4}>
-                                        Date Sighted
+
                                     </Grid.Column>
                                 </Grid.Row>
                                 }
@@ -277,10 +286,10 @@ Flower Spotter
 
                                     </Grid.Column>
                                     <Grid.Column width={4}>
-                                        Location
+
                                     </Grid.Column>
                                     <Grid.Column width={4}>
-                                        Date Sighted
+
                                     </Grid.Column>
                                 </Grid.Row>
                                 }
@@ -293,10 +302,10 @@ Flower Spotter
 
                                     </Grid.Column>
                                     <Grid.Column width={4}>
-                                        Location
+
                                     </Grid.Column>
                                     <Grid.Column width={4}>
-                                        Date Sighted
+
                                     </Grid.Column>
                                 </Grid.Row>
                                 }
@@ -309,10 +318,10 @@ Flower Spotter
 
                                     </Grid.Column>
                                     <Grid.Column width={4}>
-                                        Location
+
                                     </Grid.Column>
                                     <Grid.Column width={4}>
-                                        Date Sighted
+
                                     </Grid.Column>
                                 </Grid.Row>
                                 }
@@ -325,10 +334,10 @@ Flower Spotter
 
                                     </Grid.Column>
                                     <Grid.Column width={4}>
-                                        Location
+
                                     </Grid.Column>
                                     <Grid.Column width={4}>
-                                        Date Sighted
+
                                     </Grid.Column>
                                 </Grid.Row>
                                 }
@@ -341,10 +350,10 @@ Flower Spotter
 
                                     </Grid.Column>
                                     <Grid.Column width={4}>
-                                        Location
+
                                     </Grid.Column>
                                     <Grid.Column width={4}>
-                                        Date Sighted
+
                                     </Grid.Column>
                                 </Grid.Row>
                                 }
@@ -356,10 +365,10 @@ Flower Spotter
 
                                     </Grid.Column>
                                     <Grid.Column width={4}>
-                                        Location
+
                                     </Grid.Column>
                                     <Grid.Column width={4}>
-                                        Date Sighted
+
                                     </Grid.Column>
                                 </Grid.Row>
                                 }
@@ -384,6 +393,13 @@ Flower Spotter
                     </Grid.Row>
                 </Grid>
                 <Divider/>
+                <Grid>
+                    <Grid.Row>
+                        <Grid.Column>
+                        </Grid.Column>
+                    </Grid.Row>
+                </Grid>
+
                 <div>
                     <div className='homeSection'>
                         <Divider/>
