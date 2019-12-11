@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Form, Grid, Divider, Segment, Label, Icon, Dropdown, Menu,Card, Placeholder} from 'semantic-ui-react'
+import {Button, Form, Grid, Divider, Segment, Label, Icon, Dropdown, Menu, Card, Placeholder} from 'semantic-ui-react'
 import '../pageStyles/MainPage.css'
 import axios from 'axios';
 
@@ -18,10 +18,14 @@ class MainPage extends Component {
             textBased: "",
             flowerInput: "Draperia",
             flowerReturn: 10,
-            flowerSightings: []
+            flowerSightings: [],
+            flowersDB: [],
+            dopt: [],
+            visCrt: []
         };
         this.onHomePress = this.onHomePress.bind(this);
     }
+
     onHomePress = () => {
         this.props.history.push('/homepage/' + this.props.getId);
     };
@@ -37,29 +41,71 @@ class MainPage extends Component {
 
 
     onFlowerList = () => {
-        axios.post('http://localhost:8000/api/sightings',  {name: "Draperia"},
+        axios.post('http://localhost:8000/api/sightings', {name: "Draperia"},
             {headers: {'Content-Type': 'application/json'}}
         )
             .then(res => {
-               console.log('tried');
-               console.log(res.data[0]);
-               console.log(res.data.rows[0]);
-               console.log (res.data.rows.length);
-               console.log(res.data.rows[0].name);
-               var b = [];
-               this.setState({r1:res.data.rows[0]});
-                for (let i = 0, v = res.data.rows.length; i < v; i++){
+                console.log('tried');
+                console.log(res.data[0]);
+                console.log(res.data.rows[0]);
+                console.log(res.data.rows.length);
+                console.log(res.data.rows[0].name);
+                var b = [];
+                this.setState({r1: res.data.rows[0]});
+                for (let i = 0, v = res.data.rows.length; i < v; i++) {
                     console.log(res.data.rows[i]);
                     this.setState({flowerSightings: this.state.flowerSightings.concat(res.data.rows[i])}, () => console.log(this.state.flowerSightings));
                 }
                 console.log(this.state.flowerSightings);
-console.log(this.state.flowerSightings[0]["NAME"]
-    );
+                console.log(this.state.flowerSightings[0]["NAME"]);
+                console.log(this.state.flowerSightings[1]["NAME"]
+                );
             })
             .catch(err => {
                 console.log(err);
             })
     };
+
+    onAllFlowers = () => {
+        axios.get('http://localhost:8000/api/flowers/db',
+            {headers: {'Content-Type': 'application/json'}}
+        )
+            .then(res => {
+                console.log(res.data.rows[0]["NAME"]);
+                this.setState({r1: res.data.rows[0]});
+                for (let i = 0, v = res.data.rows.length; i < v; i++) {
+                    //console.log(res.data.rows[i]);
+                    this.setState({flowersDB: this.state.flowersDB.concat(res.data.rows[i]["NAME"])}, () => console.log(this.state.flowersDB));
+                }
+                this.handleCurrFlowers(this);
+            })
+            .catch(err => {
+                console.log(err);
+            })
+    };
+
+onComplete () {
+    //
+}
+
+    handleCurrFlowers = () => {
+    //USED TO ADD AND REMOVE FROM DROPDOWN *BASED ON BACKEND* do insertions and deletions there, NOT HERE
+        for(var b = 0, len = this.state.flowersDB.length; b < len; b++){
+            console.log(this.state.flowersDB[b]);
+            console.log('50');
+            this.setState({
+                dopt: this.state.dopt.concat( {
+                    key: this.state.dopt.length + 9,
+                    text: this.state.flowersDB[b] , value: this.state.dopt.length + 9,
+                    onClick: (this.onComplete.bind('')),
+                    selected: this.state.visCrt === 1 + 9
+                }, () => console.log(this.state.dopt)),
+            });
+        }
+        console.log(this.state.flowersDB);
+        console.log(this.state.dopt);
+
+        };
 
 
     onFlowerUpdate = () => {
@@ -69,14 +115,18 @@ console.log(this.state.flowerSightings[0]["NAME"]
     onFlowerInsert = () => {
         //
     };
-componentDidMount () {
-    this.onFlowerList(this);
-};
+
+    componentDidMount() {
+        this.onFlowerList(this);
+
+        ///////////
+        this.onAllFlowers(this); //RUN AGAIN EACH TIME A FLOWER IS ADDED ---- SO IT POPULATES IN DROP DONW
+        //////
+        /////
+        //////
 
 
-
-//ERROR BC IT IS RUNNING IN RENDER METHOD _------- DO NOT HAVE ONCLICK RENDER
-
+    };
 
     render() {
         const options = [
@@ -91,11 +141,11 @@ componentDidMount () {
         return (
             <div className="box">
                 <fieldset>
-                        <Label color = 'grey'><b>Update A Flower's Information</b></Label>
-                <Divider />
+                    <Label color='grey'><b>Update A Flower's Information</b></Label>
+                    <Divider/>
                     <Grid columns={3}>
                         <Grid.Row>
-                        <Grid.Column>
+                            <Grid.Column>
                                 <Menu inverted color='grey' className="menu" fluid>
                                     <Menu.Menu className='menu' fluid>
                                         <Button.Group color='grey' className='groups'>
@@ -113,35 +163,35 @@ componentDidMount () {
                                         </Button.Group>
                                     </Menu.Menu>
                                 </Menu>
-                        </Grid.Column>
+                            </Grid.Column>
                         </Grid.Row>
                         <Grid.Row>
-                        <Grid.Column>
-                            <Segment inverted color='teal'>
-                                        <Form.Field className='emailInput'>
-                                            <label>Genus</label>
-                                            <Form>
-                                                <input
-                                                    placeholder='ex: Carex '
-                                                    autoComplete="off"
-                                                />
-                                            </Form>
-                                        </Form.Field>
-                            </Segment>
-                        </Grid.Column>
-                        <Grid.Column>
-                            <Segment inverted color='teal'>
-                                <Form.Field className='emailInput'>
-                                    <label>Species</label>
-                                    <Form>
-                                        <input
-                                            placeholder='ex: Limosa '
-                                            autoComplete="off"
-                                        />
-                                    </Form>
-                                </Form.Field>
-                            </Segment>
-                        </Grid.Column>
+                            <Grid.Column>
+                                <Segment inverted color='teal'>
+                                    <Form.Field className='emailInput'>
+                                        <label>Genus</label>
+                                        <Form>
+                                            <input
+                                                placeholder='ex: Carex '
+                                                autoComplete="off"
+                                            />
+                                        </Form>
+                                    </Form.Field>
+                                </Segment>
+                            </Grid.Column>
+                            <Grid.Column>
+                                <Segment inverted color='teal'>
+                                    <Form.Field className='emailInput'>
+                                        <label>Species</label>
+                                        <Form>
+                                            <input
+                                                placeholder='ex: Limosa '
+                                                autoComplete="off"
+                                            />
+                                        </Form>
+                                    </Form.Field>
+                                </Segment>
+                            </Grid.Column>
                             <Grid.Column>
 
                                 <Segment inverted color='teal'>
@@ -171,234 +221,241 @@ componentDidMount () {
                                 }
                             </Grid.Column>
                             <Grid.Column verticalAlign="center">
-                                <Button color='grey'  fluid size="medium" icon labelPosition='right'
+                                <Button color='grey' fluid size="medium" icon labelPosition='right'
                                     /*onClick={this.addDataSet.bind(this)}*/>
                                     Update Flower
-                                    <Icon name='upload' color="white" fitted ='true'/>
+                                    <Icon name='upload' color="white" fitted='true'/>
                                 </Button>
                             </Grid.Column>
 
                         </Grid.Row>
                     </Grid>
                 </fieldset>
-                <Grid>
-                    <Grid.Row>
-                        <Grid.Column width = {4}>
-                            <Menu inverted color='grey' floated="right ">
-                                <Menu.Menu fluid>
-                                    <Button.Group color='grey' fluid>
-                                        <Dropdown
-                                            button
-                                            simple
-                                            fluid
-                                            open={this.state.hasClicked2}
-                                            closeOnChange={true}
-                                            options={options}
-                                            trigger={trigger}
-                                        />
-                                    </Button.Group>
-                                </Menu.Menu>
-                            </Menu>
-            </Grid.Column>
-                        <Grid.Column width = {5} floated = 'right' textAlign = 'center'>
-                            <Grid celled>
-                                    <Grid.Row color = 'grey'>
-                                        <Grid.Column width = {16} textAlign = 'center'>
-                                            Flower Sightings
+                <Grid padded='very' relaxed='very'>
+                    <Grid.Row floated='right'>
+                        <Grid.Column width={8}>
+                            <Grid.Row>
+                                <Menu inverted color='grey' floated="right" fluid scrolling = 'true'>
+                                    <Menu.Menu fluid>
+                                        <Button.Group color='grey' fluid>
+                                            <Dropdown
+                                                keepOnScreen = 'true'
+                                                scrolling = 'true'
+                                                search = 'true'
+                                                button
+                                                simple
+                                                fluid
+                                                open={this.state.hasClicked2}
+                                                closeOnChange={true}
+                                                options={this.state.dopt}
+                                                trigger={trigger}
+                                            />
+                                        </Button.Group>
+                                    </Menu.Menu>
+                                </Menu>
+                            </Grid.Row>
+                            <Grid.Row floated='right'>
+                                <Grid celled floated='right' padded='horizontally'>
+                                    <Grid.Row color='grey'>
+                                        <Grid.Column width={16} textAlign='center'>
+                                            <h3>Flower Sightings</h3>
                                         </Grid.Column>
                                     </Grid.Row>
-                                {this.state.flowerSightings.length !== 0 &&
-                                <Grid.Row>
-                                    <Grid.Column width={4}>
-                                        Flower Spotted
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-                                        Flower Spotter
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-                                        Location
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-                                        Date Sighted
-                                    </Grid.Column>
-                                </Grid.Row>
-                                }
-                                {this.state.flowerSightings.rows[0]["NAME") != null &&
-                                <Grid.Row>
-                                    <Grid.Column width={4}>
-                                        {this.state.flowerSightings[0]["NAME"] &&
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                </Grid.Row>
-                                }
-                                {this.state.flowerSightings.length >= 2 &&
-                                <Grid.Row>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                </Grid.Row>
-                                }
-                                {this.state.flowerSightings.length >=3 &&
-                                <Grid.Row>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                </Grid.Row>
-                                }
-                                {this.state.flowerSightings.length >=4 &&
-                                <Grid.Row>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                </Grid.Row>
-                                }
-                                {this.state.flowerSightings.length >=5 &&
-                                <Grid.Row>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                </Grid.Row>
-                                }
-                                {this.state.flowerSightings.length >=6 &&
-                                <Grid.Row>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                </Grid.Row>
-                                }
-                                {this.state.flowerSightings.length >=7 &&
-                                <Grid.Row>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                </Grid.Row>
-                                }
-                                {this.state.flowerSightings.length >=8 &&
-                                <Grid.Row>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                </Grid.Row>
-                                }
-                                {this.state.flowerSightings.length >=9 &&
-                                <Grid.Row>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                </Grid.Row>
-                                }
-                                {this.state.flowerSightings.length >=10 &&
-                                <Grid.Row>
-                                    <Grid.Column width={4}>
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                    <Grid.Column width={4}>
-
-                                    </Grid.Column>
-                                </Grid.Row>
-                                }
-
-                            </Grid>
+                                    {this.state.flowerSightings.length !== 0 &&
+                                    <Grid.Row>
+                                        <Grid.Column width={4}>
+                                            Flower Spotted
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            Flower Spotter
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            Location
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            Date Sighted
+                                        </Grid.Column>
+                                    </Grid.Row>
+                                    }
+                                    {this.state.flowerSightings.length >= 1 &&
+                                    <Grid.Row>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[0]["NAME"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[0]["PERSON"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[0]["LOCATION"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[0]["SIGHTED"]}
+                                        </Grid.Column>
+                                    </Grid.Row>
+                                    }
+                                    {this.state.flowerSightings.length >= 2 &&
+                                    <Grid.Row>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[1]["NAME"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[1]["PERSON"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[1]["LOCATION"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[1]["SIGHTED"]}
+                                        </Grid.Column>
+                                    </Grid.Row>
+                                    }
+                                    {this.state.flowerSightings.length >= 3 &&
+                                    <Grid.Row>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[2]["NAME"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[2]["PERSON"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[2]["LOCATION"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[2]["SIGHTED"]}
+                                        </Grid.Column>
+                                    </Grid.Row>
+                                    }
+                                    {this.state.flowerSightings.length >= 4 &&
+                                    <Grid.Row>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[3]["NAME"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[3]["PERSON"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[3]["LOCATION"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[3]["SIGHTED"]}
+                                        </Grid.Column>
+                                    </Grid.Row>
+                                    }
+                                    {this.state.flowerSightings.length >= 5 &&
+                                    <Grid.Row>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[4]["NAME"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[4]["PERSON"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[4]["LOCATION"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[4]["SIGHTED"]}
+                                        </Grid.Column>
+                                    </Grid.Row>
+                                    }
+                                    {this.state.flowerSightings.length >= 6 &&
+                                    <Grid.Row>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[5]["NAME"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[5]["PERSON"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[5]["LOCATION"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[5]["SIGHTED"]}
+                                        </Grid.Column>
+                                    </Grid.Row>
+                                    }
+                                    {this.state.flowerSightings.length >= 7 &&
+                                    <Grid.Row>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[6]["NAME"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[6]["PERSON"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[6]["LOCATION"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[6]["SIGHTED"]}
+                                        </Grid.Column>
+                                    </Grid.Row>
+                                    }
+                                    {this.state.flowerSightings.length >= 8 &&
+                                    <Grid.Row>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[7]["NAME"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[7]["PERSON"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[7]["LOCATION"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[7]["SIGHTED"]}
+                                        </Grid.Column>
+                                    </Grid.Row>
+                                    }
+                                    {this.state.flowerSightings.length >= 9 &&
+                                    <Grid.Row>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[8]["NAME"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[8]["PERSON"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[8]["LOCATION"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[8]["SIGHTED"]}
+                                        </Grid.Column>
+                                    </Grid.Row>
+                                    }
+                                    {this.state.flowerSightings.length >= 10 &&
+                                    <Grid.Row>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[9]["NAME"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[9]["PERSON"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[9]["LOCATION"]}
+                                        </Grid.Column>
+                                        <Grid.Column width={4}>
+                                            {this.state.flowerSightings[9]["SIGHTED"]}
+                                        </Grid.Column>
+                                    </Grid.Row>
+                                    }
+                                </Grid>
+                            </Grid.Row>
                         </Grid.Column>
-                        <Grid.Column width = {6}>
-<Segment basic floated = 'right'>
-    <Card>
-        {/*put flower name as header*/}
-        <Card.Header/>
-        <Card.Content>
-            <Placeholder>
-                <Placeholder.Image rectangular>
 
-                </Placeholder.Image>
-            </Placeholder>
-        </Card.Content>
-    </Card>
-</Segment>
+
+                        <Grid.Column width={8}>
+                            <Segment basic floated='right'>
+                                <Card>
+                                    {/*put flower name as header*/}
+                                    <Card.Header/>
+                                    <Card.Content>
+                                        <Placeholder>
+                                            <Placeholder.Image square>
+
+                                            </Placeholder.Image>
+                                        </Placeholder>
+                                    </Card.Content>
+                                </Card>
+                            </Segment>
                         </Grid.Column>
                     </Grid.Row>
                 </Grid>
@@ -429,6 +486,7 @@ componentDidMount () {
                 </div>
             </div>
         )
-}}
+    }
+}
 
 export default MainPage
