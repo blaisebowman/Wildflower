@@ -90,3 +90,8 @@ Form {
     height: 60vh;
     width: 100vw;
 }
+.ui.menu.scrolling {
+    max-height: 20.57142857rem;
+    overflow-x: hidden;
+    overflow-y: hidden;
+}

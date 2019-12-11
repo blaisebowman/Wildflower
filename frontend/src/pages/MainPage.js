@@ -21,7 +21,8 @@ class MainPage extends Component {
             flowerSightings: [],
             flowersDB: [],
             dopt: [],
-            visCrt: []
+            visCrt: [],
+            text:""
         };
         this.onHomePress = this.onHomePress.bind(this);
     }
@@ -32,16 +33,10 @@ class MainPage extends Component {
 
     onSubmit = () => {
 
-
     };
 
-    handleChange = () => {
-
-    };
-
-
-    onFlowerList = () => {
-        axios.post('http://localhost:8000/api/sightings', {name: "Draperia"},
+    onFlowerList = (name) => {
+        axios.post('http://localhost:8000/api/sightings', {name: name},
             {headers: {'Content-Type': 'application/json'}}
         )
             .then(res => {
@@ -87,24 +82,32 @@ class MainPage extends Component {
 onComplete () {
     //
 }
+/*handleDropdownClick = (text) =>{
+    this.setState({text: text});
+    console.log('dropdown clicked');
+};*/
 
     handleCurrFlowers = () => {
+
+
+        ///is not DISPLAYING IN ORDER.... CHECK SQL ALPINE PENSETEMON
+
+
+
     //USED TO ADD AND REMOVE FROM DROPDOWN *BASED ON BACKEND* do insertions and deletions there, NOT HERE
         for(var b = 0, len = this.state.flowersDB.length; b < len; b++){
             console.log(this.state.flowersDB[b]);
             console.log('50');
             this.setState({
-                dopt: this.state.dopt.concat( {
-                    key: this.state.dopt.length + 9,
-                    text: this.state.flowersDB[b] , value: this.state.dopt.length + 9,
-                    onClick: (this.onComplete.bind('')),
-                    selected: this.state.visCrt === 1 + 9
-                }, () => console.log(this.state.dopt)),
-            });
-        }
+                dopt: this.state.dopt.concat({
+                    key: this.state.dopt.length ,
+                    text: this.state.flowersDB[b] , value: this.state.dopt.length ,
+                    onClick: (this.handleChange.bind(String(this.state.flowersDB[b])))
+        })
+        });
         console.log(this.state.flowersDB);
         console.log(this.state.dopt);
-
+        }
         };
 
 
@@ -117,16 +120,39 @@ onComplete () {
     };
 
     componentDidMount() {
-        this.onFlowerList(this);
+        //this.onFlowerList(this);
 
         ///////////
         this.onAllFlowers(this); //RUN AGAIN EACH TIME A FLOWER IS ADDED ---- SO IT POPULATES IN DROP DONW
         //////
         /////
-        //////
-
 
     };
+    handleClick = () => {
+        console.log('dropdown clicked');
+        if(this.state.hasClicked2 === false){
+            this.setState({hasClicked2: true});
+        }
+        else {
+            this.setState({hasClicked2: false});
+        }
+    };
+    handleClose = () =>{
+        this.setState({hasClicked2: false});
+    };
+
+    handleChange = (e, { name, text }) => {
+        this.setState({ [name]: text });
+        console.log(name);
+    console.log(text);
+this.setState({flowerSightings: []});
+    this.onFlowerList(text);
+
+    };
+
+
+    handleText = (e, { text }) => this.setState({ text });
+
 
     render() {
         const options = [
@@ -193,7 +219,6 @@ onComplete () {
                                 </Segment>
                             </Grid.Column>
                             <Grid.Column>
-
                                 <Segment inverted color='teal'>
                                     <Form.Field className='emailInput'>
                                         <label>Common Name</label>
@@ -227,7 +252,6 @@ onComplete () {
                                     <Icon name='upload' color="white" fitted='true'/>
                                 </Button>
                             </Grid.Column>
-
                         </Grid.Row>
                     </Grid>
                 </fieldset>
@@ -235,36 +259,40 @@ onComplete () {
                     <Grid.Row floated='right'>
                         <Grid.Column width={8}>
                             <Grid.Row>
+                                <Grid.Column>
                                 <Menu inverted color='grey' floated="right" fluid scrolling = 'true'>
-                                    <Menu.Menu fluid>
-                                        <Button.Group color='grey' fluid>
+                                    <Menu.Menu>
+                                        <Button.Group color='white' fluid>
                                             <Dropdown
-                                                keepOnScreen = 'true'
                                                 scrolling = 'true'
                                                 search = 'true'
                                                 button
-                                                simple
+                                                selection
                                                 fluid
+                                                onClick = {this.handleClick}
                                                 open={this.state.hasClicked2}
-                                                closeOnChange={true}
+                                                onClose = {this.handleClose}
+                                                openOnFocus
+                                                onChange={this.handleChange}
                                                 options={this.state.dopt}
                                                 trigger={trigger}
                                             />
                                         </Button.Group>
                                     </Menu.Menu>
                                 </Menu>
+                                </Grid.Column>
                             </Grid.Row>
                             <Grid.Row floated='right'>
                                 <Grid celled floated='right' padded='horizontally'>
                                     <Grid.Row color='grey'>
                                         <Grid.Column width={16} textAlign='center'>
-                                            <h3>Flower Sightings</h3>
+                                            <b>Flower Sightings</b>
                                         </Grid.Column>
                                     </Grid.Row>
                                     {this.state.flowerSightings.length !== 0 &&
                                     <Grid.Row>
-                                        <Grid.Column width={4}>
-                                            Flower Spotted
+                                        <Grid.Column width={4} textAlign = 'center'>
+                                            <h3>Flower Spotted</h3>
                                         </Grid.Column>
                                         <Grid.Column width={4}>
                                             Flower Spotter
