@@ -134,7 +134,7 @@ app.delete("/api/user/:id", (req, res, next) => {
 
 app.get("/api/flowers/db", (req, res, next) => {
     var name = req.body.name;
-    let sql = "select DISTINCT (NAME,GENUS, SPECIES ) from 'sightings'";
+    let sql = "select DISTINCT (NAME) from 'sightings'";
     db.all(sql, name, (err, rows) => {
         if (err) {
             res.status(400).json({"error": err.message});

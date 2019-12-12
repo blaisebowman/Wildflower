@@ -141,8 +141,9 @@ onComplete () {
         this.setState({text: text});
         console.log(name);
         console.log(text);
-        client.search(text + ' flower 600 x 600')
+        client.search(text + ' flower')
             .then(images => {
+                console.log(images);
                 console.log(this.state.url);
                 console.log(JSON.stringify(images));
                 console.log(images[0]["url"]);
@@ -160,7 +161,7 @@ onComplete () {
     render() {
         const options = [
             //HAVE OPTIONS POPULATE FROM THE DATABASE WITH AXIOS REQUEST
-            {key: 1, text: 'Draperia', value: 1, onClick: (''), selected: this.state.vis === 1}
+            /*{key: 1, text: 'Draperia', value: 1, onClick: (''), selected: this.state.vis === 1}*/
         ];
 
         const trigger = (
@@ -198,7 +199,7 @@ onComplete () {
                             <Grid.Column>
                                 <Segment inverted color='teal'>
                                     <Form.Field className='emailInput'>
-                                        <label>Genus</label>
+                                        <label><b>Genus</b></label>
                                         <Form>
                                             <input
                                                 placeholder='ex: Carex '
@@ -211,7 +212,7 @@ onComplete () {
                             <Grid.Column>
                                 <Segment inverted color='teal'>
                                     <Form.Field className='emailInput'>
-                                        <label>Species</label>
+                                        <label><b>Species</b></label>
                                         <Form>
                                             <input
                                                 placeholder='ex: Limosa '
@@ -224,7 +225,7 @@ onComplete () {
                             <Grid.Column>
                                 <Segment inverted color='teal'>
                                     <Form.Field className='emailInput'>
-                                        <label>Common Name</label>
+                                        <label><b>Common Name</b></label>
                                         <Form>
                                             <input
                                                 placeholder='ex: Mud sedge '
@@ -258,17 +259,97 @@ onComplete () {
                         </Grid.Row>
                     </Grid>
                 </fieldset>
+
+                <fieldset>
+                    <Label color='grey'><Icon name = 'compose'/><b>Report a New Flower Sighting</b></Label>
+                    <Divider/>
+                    <Grid columns={4}>
+                        <Grid.Row>
+                            <Grid.Column>
+                                <Segment inverted color='teal'>
+                                    <Form.Field required className='emailInput'>
+                                        <label><b>Flower Common Name</b></label>
+                                        <Form>
+                                            <input
+                                                placeholder='ex: Mud sedge '
+                                                autoComplete="off"
+                                            />
+                                        </Form>
+                                    </Form.Field>
+                                </Segment>
+                            </Grid.Column>
+                            <Grid.Column>
+                                <Segment inverted color='teal'>
+                                    <Form.Field required className='emailInput'>
+                                        <label><b>Spotter/Person</b></label>
+                                        <Form>
+                                            <input
+                                                placeholder='ex: Samuel '
+                                                autoComplete="off"
+                                            />
+                                        </Form>
+                                    </Form.Field>
+                                </Segment>
+                            </Grid.Column>
+                            <Grid.Column>
+                                <Segment inverted color='teal'>
+                                    <Form.Field required className='emailInput'>
+                                        <label><b>Location</b></label>
+                                        <Form>
+                                            <input
+                                                placeholder='ex: Alaska Flat'
+                                                autoComplete="off"
+                                            />
+                                        </Form>
+                                    </Form.Field>
+                                </Segment>
+                            </Grid.Column>
+                            <Grid.Column>
+                                <Segment inverted color='teal'>
+                                    <Form.Field required className='emailInput'>
+                                        <label><b>Date Sighted</b></label>
+                                        <Form>
+                                            <input
+                                                placeholder='ex: 2019-09-27'
+                                                autoComplete="off"
+                                            />
+                                        </Form>
+                                    </Form.Field>
+                                </Segment>
+                            </Grid.Column>
+                        </Grid.Row>
+                        <Grid.Row>
+                            <Grid.Column floated="left">
+                            </Grid.Column>
+                            <Grid.Column verticalAlign="center">
+                                {this.state.popUp === true &&
+                                <Button size='medium' color='yellow' onClick={this.closeModal} toggle={!this.popUp}>
+                                    <Icon name='remove' color="black"/><b className="text">Warning: Flower not found</b>
+                                </Button>
+                                }
+                            </Grid.Column>
+                            <Grid.Column verticalAlign="center">
+                                <Button color='grey' fluid size="medium" icon labelPosition='right'
+                                    /*onClick={this.addDataSet.bind(this)}*/>
+                                    Report Sighting
+                                    <Icon name='upload' color="white" fitted='true'/>
+                                </Button>
+                            </Grid.Column>
+                        </Grid.Row>
+                    </Grid>
+                </fieldset>
+
                 <Grid padded='very' relaxed='very'>
                     <Grid.Row floated='right'>
                         <Grid.Column width={8}>
                             <Grid.Row>
                                 <Grid.Column>
                                 <Menu inverted color='grey' floated="right" fluid scrolling = 'true'>
-                                    <Menu.Menu>
+                                    <Menu.Menu color = 'grey'>
                                         <Button.Group color='white' fluid>
                                             <Dropdown
                                                 scrolling = 'true'
-                                                searching
+                                                search = 'true'
                                                 selection
                                                 button
                                                 fluid
@@ -280,13 +361,14 @@ onComplete () {
                                                 options={this.state.dopt}
                                                 placeholder = "Enter a flower name"
                                                 text = {this.state.text}
-
                                             />
                                         </Button.Group>
                                     </Menu.Menu>
                                 </Menu>
                                 </Grid.Column>
                             </Grid.Row>
+                            <Divider />
+
                             <Grid.Row floated='right'>
                                 <Grid celled floated='right' padded='horizontally'>
                                     <Grid.Row color='grey'>
@@ -298,7 +380,7 @@ onComplete () {
                                     </Grid.Row>
 
                                     {this.state.flowerSightings.length !== 0 &&
-                                    <Grid.Row>
+                                    <Grid.Row color = 'teal'>
                                         <Grid.Column width={4} textAlign = 'center'>
                                             Flower Spotted
                                         </Grid.Column>
