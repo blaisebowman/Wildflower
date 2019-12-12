@@ -1,7 +1,9 @@
 import React, {Component} from 'react';
-import {Button, Form, Grid, Divider, Segment, Label, Icon, Dropdown, Menu, Card, Placeholder} from 'semantic-ui-react'
+import {Button, Form, Grid, Divider, Segment, Label, Icon, Dropdown, Menu, Card, Placeholder, Image} from 'semantic-ui-react'
 import '../pageStyles/MainPage.css'
 import axios from 'axios';
+const GoogleImages = require('google-images');
+const client = new GoogleImages('013885028907795664912:7vhaocgxitg', 'AIzaSyCxoZDZ3fQAPI9BNevm7eDONwBmjh5iWZw');
 
 class MainPage extends Component {
 
@@ -22,9 +24,11 @@ class MainPage extends Component {
             flowersDB: [],
             dopt: [],
             visCrt: [],
-            text:""
+            text:"",
+            url:""
         };
         this.onHomePress = this.onHomePress.bind(this);
+
     }
 
     onHomePress = () => {
@@ -82,18 +86,8 @@ class MainPage extends Component {
 onComplete () {
     //
 }
-/*handleDropdownClick = (text) =>{
-    this.setState({text: text});
-    console.log('dropdown clicked');
-};*/
 
     handleCurrFlowers = () => {
-
-
-        ///is not DISPLAYING IN ORDER.... CHECK SQL ALPINE PENSETEMON
-
-
-
     //USED TO ADD AND REMOVE FROM DROPDOWN *BASED ON BACKEND* do insertions and deletions there, NOT HERE
         for(var b = 0, len = this.state.flowersDB.length; b < len; b++){
             console.log(this.state.flowersDB[b]);
@@ -120,6 +114,7 @@ onComplete () {
     };
 
     componentDidMount() {
+
         //this.onFlowerList(this);
 
         ///////////
@@ -141,18 +136,26 @@ onComplete () {
         this.setState({hasClicked2: false});
     };
 
-    handleChange = (e, { name, text }) => {
-        this.setState({ [name]: text });
+    handleChange = (e, {name, text}) => {
+        this.setState({[name]: text});
+        this.setState({text: text});
         console.log(name);
-    console.log(text);
-this.setState({flowerSightings: []});
-    this.onFlowerList(text);
-
+        console.log(text);
+        client.search(text + ' flower 600 x 600')
+            .then(images => {
+                console.log(this.state.url);
+                console.log(JSON.stringify(images));
+                console.log(images[0]["url"]);
+                console.log(images["url"]);
+                console.log(JSON.stringify(images["url"]));
+                this.setState({url: images[0].url});
+                console.log(this.state.url);
+            });
+        this.setState({flowerSightings: []});
+        this.onFlowerList(text);
     };
 
-
     handleText = (e, { text }) => this.setState({ text });
-
 
     render() {
         const options = [
@@ -173,11 +176,11 @@ this.setState({flowerSightings: []});
                         <Grid.Row>
                             <Grid.Column>
                                 <Menu inverted color='grey' className="menu" fluid>
-                                    <Menu.Menu className='menu' fluid>
-                                        <Button.Group color='grey' className='groups'>
+                                    <Menu.Menu className='menu' fluid floated = 'right'>
+                                        <Button.Group color='grey' className='groups' fluid>
                                             <Dropdown
                                                 scrolling
-                                                searching
+                                                searh = 'true'
                                                 button
                                                 simple
                                                 fluid
@@ -265,9 +268,9 @@ this.setState({flowerSightings: []});
                                         <Button.Group color='white' fluid>
                                             <Dropdown
                                                 scrolling = 'true'
-                                                search = 'true'
-                                                button
+                                                searching
                                                 selection
+                                                button
                                                 fluid
                                                 onClick = {this.handleClick}
                                                 open={this.state.hasClicked2}
@@ -275,7 +278,9 @@ this.setState({flowerSightings: []});
                                                 openOnFocus
                                                 onChange={this.handleChange}
                                                 options={this.state.dopt}
-                                                trigger={trigger}
+                                                placeholder = "Enter a flower name"
+                                                text = {this.state.text}
+
                                             />
                                         </Button.Group>
                                     </Menu.Menu>
@@ -285,14 +290,17 @@ this.setState({flowerSightings: []});
                             <Grid.Row floated='right'>
                                 <Grid celled floated='right' padded='horizontally'>
                                     <Grid.Row color='grey'>
+                                        {this.state.flowerSightings.length !== 0 &&
                                         <Grid.Column width={16} textAlign='center'>
                                             <b>Flower Sightings</b>
                                         </Grid.Column>
+                                        }
                                     </Grid.Row>
+
                                     {this.state.flowerSightings.length !== 0 &&
                                     <Grid.Row>
                                         <Grid.Column width={4} textAlign = 'center'>
-                                            <h3>Flower Spotted</h3>
+                                            Flower Spotted
                                         </Grid.Column>
                                         <Grid.Column width={4}>
                                             Flower Spotter
@@ -469,20 +477,11 @@ this.setState({flowerSightings: []});
                             </Grid.Row>
                         </Grid.Column>
 
-
                         <Grid.Column width={8}>
                             <Segment basic floated='right'>
-                                <Card>
-                                    {/*put flower name as header*/}
-                                    <Card.Header/>
-                                    <Card.Content>
-                                        <Placeholder>
-                                            <Placeholder.Image square>
 
-                                            </Placeholder.Image>
-                                        </Placeholder>
-                                    </Card.Content>
-                                </Card>
+                                        <Image fluid size = "massive" src = {this.state.url}/>
+
                             </Segment>
                         </Grid.Column>
                     </Grid.Row>
