@@ -25,7 +25,11 @@ class MainPage extends Component {
             dopt: [],
             visCrt: [],
             text:"",
-            url:""
+            url:"",
+            submitFlower: "",
+            submitPerson: "",
+            submitLocation: "",
+            submitData: ""
         };
         this.onHomePress = this.onHomePress.bind(this);
 
@@ -136,6 +140,23 @@ onComplete () {
         this.setState({hasClicked2: false});
     };
 
+    addFlower = () => {
+        axios.post('http://localhost:8000/api/flowers/update', { arr:info},
+            {headers: {'Content-Type': 'application/json'}}
+        ).then(res => {
+            console.log(res.data.rows[0]["NAME"]);
+            this.setState({r1: res.data.rows[0]});
+            for (let i = 0, v = res.data.rows.length; i < v; i++) {
+                //console.log(res.data.rows[i]);
+                this.setState({flowersDB: this.state.flowersDB.concat(res.data.rows[i]["NAME"])}, () => console.log(this.state.flowersDB));
+            }
+            this.handleCurrFlowers(this);
+        })
+            .catch(err => {
+                console.log(err);
+            })
+    };
+
     handleChange = (e, {name, text}) => {
         this.setState({[name]: text});
         this.setState({text: text});
@@ -157,6 +178,29 @@ onComplete () {
     };
 
     handleText = (e, { text }) => this.setState({ text });
+    handleChange2 = (e, { name, value }) => this.setState({ [name]: value })
+
+    handleSubmit = () => {
+        const { name, person, location, date } = this.state;
+        //this.setState({ flowerSubmit: name, personSubmit: person, location: location, sighted : date });
+        var opt = [{name: name}, {person: person}, {location: location}, {sighted: date}];
+        axios.post('http://localhost:8000/api/flowers/update', {arr:opt},
+            {headers: {'Content-Type': 'application/json'}}
+        ).then(res => {
+            console.log(res.data.rows[0]["NAME"]);
+            this.setState({r1: res.data.rows[0]});
+            for (let i = 0, v = res.data.rows.length; i < v; i++) {
+                //console.log(res.data.rows[i]);
+                this.setState({flowersDB: this.state.flowersDB.concat(res.data.rows[i]["NAME"])}, () => console.log(this.state.flowersDB));
+            }
+            this.handleCurrFlowers(this);
+        })
+            .catch(err => {
+                console.log(err);
+            })
+
+    };
+
 
     render() {
         const options = [
@@ -267,54 +311,50 @@ onComplete () {
                         <Grid.Row>
                             <Grid.Column>
                                 <Segment inverted color='teal'>
-                                    <Form.Field required className='emailInput'>
-                                        <label><b>Flower Common Name</b></label>
-                                        <Form>
-                                            <input
-                                                placeholder='ex: Mud sedge '
-                                                autoComplete="off"
+                                    <Form onSubmit = {this.handleSubmit2}>
+                                        <Form.Group>
+                                            <label><b>Flower Common Name</b></label>
+                                    <Form.Input
+                                        required
+                                            placeholder = 'ex: Mud Sedge'
+                                        name = 'name'
+                                        value = {this.state.name}
+                                    />
+
+                                            <Form.Input
+                                                required className='emailInput'
+                                                placeholder = 'ex: Samuel'
+                                                name = 'person'
+                                                value = {this.state.person}
                                             />
-                                        </Form>
-                                    </Form.Field>
+
+                                            <Form.Input
+                                                required className='emailInput'
+                                                placeholder = 'ex: Alaska Flat'
+                                            value = {this.state.location}
+                                            />
+
+                                            <Form.Input
+                                                required className='emailInput'
+                                                placeholder = 'ex: 2019-07-19'
+                                            value = {this.state.date}
+                                            />
+                                        </Form.Group>
+                                    </Form>
                                 </Segment>
                             </Grid.Column>
                             <Grid.Column>
                                 <Segment inverted color='teal'>
-                                    <Form.Field required className='emailInput'>
-                                        <label><b>Spotter/Person</b></label>
-                                        <Form>
-                                            <input
-                                                placeholder='ex: Samuel '
-                                                autoComplete="off"
-                                            />
-                                        </Form>
-                                    </Form.Field>
+
                                 </Segment>
                             </Grid.Column>
                             <Grid.Column>
                                 <Segment inverted color='teal'>
-                                    <Form.Field required className='emailInput'>
-                                        <label><b>Location</b></label>
-                                        <Form>
-                                            <input
-                                                placeholder='ex: Alaska Flat'
-                                                autoComplete="off"
-                                            />
-                                        </Form>
-                                    </Form.Field>
+
                                 </Segment>
                             </Grid.Column>
                             <Grid.Column>
                                 <Segment inverted color='teal'>
-                                    <Form.Field required className='emailInput'>
-                                        <label><b>Date Sighted</b></label>
-                                        <Form>
-                                            <input
-                                                placeholder='ex: 2019-09-27'
-                                                autoComplete="off"
-                                            />
-                                        </Form>
-                                    </Form.Field>
                                 </Segment>
                             </Grid.Column>
                         </Grid.Row>
@@ -330,7 +370,7 @@ onComplete () {
                             </Grid.Column>
                             <Grid.Column verticalAlign="center">
                                 <Button color='grey' fluid size="medium" icon labelPosition='right'
-                                    /*onClick={this.addDataSet.bind(this)}*/>
+                                    onClick={this.addFlower(this)}>
                                     Report Sighting
                                     <Icon name='upload' color="white" fitted='true'/>
                                 </Button>
