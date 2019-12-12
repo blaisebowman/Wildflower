@@ -131,10 +131,11 @@ app.delete("/api/user/:id", (req, res, next) => {
         });
 });
 
-
 app.get("/api/flowers/db", (req, res, next) => {
-    var name = req.body.name;
+    //does not take user input, thus protection for SQL injection.
+    /*var name = req.body.name;*/
     let sql = "select DISTINCT (NAME) from 'sightings'";
+    //let params = [name];
     db.all(sql, name, (err, rows) => {
         if (err) {
             res.status(400).json({"error": err.message});
@@ -151,6 +152,8 @@ app.get("/api/flowers/db", (req, res, next) => {
 //If there are no sightings, will display err pop-up from frontend
 
 app.post("/api/sightings", (req, res, next) => {
+    //NOTE: already using parameterized query, VALUES (?,?,?,?) prevents user SQL injection,
+    //since sqlite treats as input data that doesn't interfere with parsing
     var name = req.body.name;
     let sql = "select * from 'sightings' where name = ? ORDER BY date(sighted) LIMIT 10";
     let params = [name];
@@ -165,13 +168,32 @@ app.post("/api/sightings", (req, res, next) => {
     });
 });
 
+app.post("/api/sightings/name", (req, res, next) => {
+    console.time('index');
+    var name = req.body.name;
+    let sql = " select * from 'sightings' where name = ? ORDER BY date(sighted) LIMIT 10";
+    let params = [name];
+        db.all(sql, name, (err, rows) => {
+            if (err) {
+                res.status(400).json({"error": err.message});
+                return;
+            }
+            res.json({
+                rows
+            })
+        });
+    });
+
 app.patch("/api/flowers/update", (req, res, next) => {
+    console.time('update');
     var data = {
         genus: req.body.genus,
         species: req.body.species,
         comName: req.body.name
     }
     db.run( //SHOULD NOT BE ABLE TO UPDATE THE COMMON NAME OF A FLOWER ALREADY IN TE DATABASE
+        //NOTE: already using parameterized query, VALUES (?,?,?,?) prevents user SQL injection,
+        //since sqlite treats as input data that doesn't interfere with parsing
             `UPDATE flowers set 
            genus = coalesce(?,genus),
            species = COALESCE(?,species), 
@@ -188,10 +210,43 @@ app.patch("/api/flowers/update", (req, res, next) => {
                 data: data
             })
         });
+    console.timeEnd('update');
 });
 
-app.post("/api/flower/sighting", (req, res, next) => {
+
+//WITH INDEX:
+app.patch("/api/flowers/update/index", (req, res, next) => {
+    console.time('update');
+    var data = {
+        genus: req.body.genus,
+        species: req.body.species,
+        comName: req.body.name
+    }
+    db.run( //SHOULD NOT BE ABLE TO UPDATE THE COMMON NAME OF A FLOWER ALREADY IN TE DATABASE
+        //NOTE: already using parameterized query, VALUES (?,?,?,?) prevents user SQL injection,
+        //since sqlite treats as input data that doesn't interfere with parsing
+        `UPDATE flowers set 
+           genus = coalesce(?,genus),
+           species = COALESCE(?,species), 
+           comname = coalesce(?,comname) 
+           WHERE comname = ?`,
+        [data.genus, data.species, data.comName, req.params.comName],
+        (err, result) => {
+            if (err) {
+                res.status(400).json({"error": res.message});
+                return;
+            }
+            res.json({
+                message: "success",
+                data: data
+            })
+        });
+    console.timeEnd('update');
+});
+
+app.post("/api/flower/found", (req, res, next) => {
 //LET USER ADD NEW FLOWER *ONLY* IN UPDATE METHOD
+    console.time('sighting');
     var errors = [];
     if (!req.body.name) {
         errors.push("No flower name specified");
@@ -215,11 +270,16 @@ app.post("/api/flower/sighting", (req, res, next) => {
         location: req.body.location,
         sighted: req.body.sighted
     };
-    var sql = 'INSERT INTO sightings (name, person, location, sighted) VALUES (?,?,?,?)'
+    console.log(data);
+    //NOTE: already using parameterized query, VALUES (?,?,?,?) prevents user SQL injection,
+    //since sqlite treats as input data that doesn't interfere with parsing
+    var sql = 'INSERT INTO sightings (name, person, location, sighted) VALUES (?,?,?,?)';
     var params = [data.name, data.person, data.location, data.sighted];
     db.run(sql, params, function (err, result) {
         if (err) {
             res.status(400).json({"error": err.message});
+            console.timeEnd('sighting');
+            console.log(data);
             return;
         }
         res.json({
@@ -227,7 +287,10 @@ app.post("/api/flower/sighting", (req, res, next) => {
             "message": "success",
             "data": data,
             "id": this.lastID
-        })
+
+
+        });
+        console.timeEnd('sighting');
     });
 });
 

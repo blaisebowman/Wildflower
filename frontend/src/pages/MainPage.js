@@ -26,9 +26,13 @@ class MainPage extends Component {
             visCrt: [],
             text:"",
             url:"",
+            flower: "",
             submitFlower: "",
+            person: "",
             submitPerson: "",
+            location: "",
             submitLocation: "",
+            data: "",
             submitData: ""
         };
         this.onHomePress = this.onHomePress.bind(this);
@@ -140,22 +144,6 @@ onComplete () {
         this.setState({hasClicked2: false});
     };
 
-    addFlower = () => {
-        axios.post('http://localhost:8000/api/flowers/update', { arr:info},
-            {headers: {'Content-Type': 'application/json'}}
-        ).then(res => {
-            console.log(res.data.rows[0]["NAME"]);
-            this.setState({r1: res.data.rows[0]});
-            for (let i = 0, v = res.data.rows.length; i < v; i++) {
-                //console.log(res.data.rows[i]);
-                this.setState({flowersDB: this.state.flowersDB.concat(res.data.rows[i]["NAME"])}, () => console.log(this.state.flowersDB));
-            }
-            this.handleCurrFlowers(this);
-        })
-            .catch(err => {
-                console.log(err);
-            })
-    };
 
     handleChange = (e, {name, text}) => {
         this.setState({[name]: text});
@@ -178,7 +166,7 @@ onComplete () {
     };
 
     handleText = (e, { text }) => this.setState({ text });
-    handleChange2 = (e, { name, value }) => this.setState({ [name]: value })
+   // handleChange2 = (e, { name, value }) => this.setState({ [name]: value })
 
     handleSubmit = () => {
         const { name, person, location, date } = this.state;
@@ -201,6 +189,50 @@ onComplete () {
 
     };
 
+    handleSubmit2 = () => {
+        console.log(this.state.flower);
+
+        //run the add flower list here
+        /*
+
+        This.state.flower = flower name
+        this.state.person  = person name
+        this.state.location = location.name
+        this.state.data = location.date
+
+
+         */
+
+var info = [{name: String(this.state.flower)}, {person:String(this.state.person)}, {location: String(this.state.location)}, {sighted: String(this.state.data)}];
+console.log(info);
+console.log(JSON.stringify(info));
+let arrObj = [
+        {"name": String(this.state.flower)}, {"person":String(this.state.person)}, {"location": String(this.state.location)}, {"sighted": String(this.state.data)}
+    ];
+        axios.post('http://localhost:8000/api/flower/found', {name: String(this.state.flower), person: String(this.state.person), location: String(this.state.location), sighted: String(this.state.data)},
+            {headers: {'Content-Type': 'application/json'}}
+        ).then(res => {
+            console.log(res);
+            console.log(res.data.rows[0]["NAME"]);
+            this.setState({r1: res.data.rows[0]});
+            for (let i = 0, v = res.data.rows.length; i < v; i++) {
+                //console.log(res.data.rows[i]);
+                this.setState({flowersDB: this.state.flowersDB.concat(res.data.rows[i]["NAME"])}, () => console.log(this.state.flowersDB));
+            }
+            this.handleCurrFlowers(this);
+        })
+            .catch(err => {
+                console.log(err);
+            });
+
+        this.setState(({flower: "", person: "", location: "" , data: ""}));
+
+
+    };
+    handleChange2 = (e, {name, value}) => {
+        this.setState({[name]: value});
+    };
+
 
     render() {
         const options = [
@@ -211,6 +243,8 @@ onComplete () {
         const trigger = (
             <span><Icon size="large" bordered={false} name='hand point right'/>{'Select a Flower'}</span>
         );
+
+        const {flower, person, location, data}  = this.state;
 
         return (
             <div className="box">
@@ -307,56 +341,64 @@ onComplete () {
                 <fieldset>
                     <Label color='grey'><Icon name = 'compose'/><b>Report a New Flower Sighting</b></Label>
                     <Divider/>
-                    <Grid columns={4}>
-                        <Grid.Row>
+
+                    <Form onSubmit = {this.handleSubmit2} >
+                        <Form.Group width = {16}>
+                    <Grid relaxed = 'very' columns={4} padded = 'horizontally' float= 'right'>
+
+                        <Grid.Row width = {16}>
+
+
                             <Grid.Column>
-                                <Segment inverted color='teal'>
-                                    <Form onSubmit = {this.handleSubmit2}>
-                                        <Form.Group>
-                                            <label><b>Flower Common Name</b></label>
+                                <Segment inverted color='teal' fluid>
+                                    <label><b>Flower Common Name</b></label>
                                     <Form.Input
                                         required
-                                            placeholder = 'ex: Mud Sedge'
-                                        name = 'name'
-                                        value = {this.state.name}
+                                        placeholder = 'ex: Mud Sedge'
+                                        name = 'flower'
+                                        value = {flower}
+                                        onChange = {this.handleChange2}
                                     />
-
-                                            <Form.Input
-                                                required className='emailInput'
-                                                placeholder = 'ex: Samuel'
-                                                name = 'person'
-                                                value = {this.state.person}
-                                            />
-
-                                            <Form.Input
-                                                required className='emailInput'
-                                                placeholder = 'ex: Alaska Flat'
-                                            value = {this.state.location}
-                                            />
-
-                                            <Form.Input
-                                                required className='emailInput'
-                                                placeholder = 'ex: 2019-07-19'
-                                            value = {this.state.date}
-                                            />
-                                        </Form.Group>
-                                    </Form>
                                 </Segment>
                             </Grid.Column>
                             <Grid.Column>
-                                <Segment inverted color='teal'>
-
+                                <Segment inverted color='teal' fluid>
+                                    <label><b>Person/Spotter</b></label>
+                                    <Form.Input
+                                        required
+                                        placeholder = 'ex: Timothy'
+                                        name ='person'
+                                        value = {this.state.person}
+                                        onChange = {this.handleChange2}
+                                    />
                                 </Segment>
                             </Grid.Column>
                             <Grid.Column>
-                                <Segment inverted color='teal'>
-
+                                <Segment inverted color='teal' fluid>
+                                    <label><b>Location</b></label>
+                                    <Form.Input
+                                        required
+                                        placeholder = 'ex: Alaska Flat'
+                                        name = 'location'
+                                        value = {this.state.location}
+                                        onChange = {this.handleChange2}
+                                    />
                                 </Segment>
                             </Grid.Column>
                             <Grid.Column>
-                                <Segment inverted color='teal'>
+                                <Segment inverted color='teal' fluid>
+                                    <label><b>Date Spotted</b></label>
+                                    <Form.Input
+                                        required
+                                        placeholder = 'ex: 2019-07-19'
+                                        name = 'data'
+                                        value = {this.state.data}
+                                        onChange = {this.handleChange2}
+                                    />
                                 </Segment>
                             </Grid.Column>
+
+
                         </Grid.Row>
                         <Grid.Row>
                             <Grid.Column floated="left">
@@ -369,14 +411,13 @@ onComplete () {
                                 }
                             </Grid.Column>
                             <Grid.Column verticalAlign="center">
-                                <Button color='grey' fluid size="medium" icon labelPosition='right'
-                                    onClick={this.addFlower(this)}>
-                                    Report Sighting
-                                    <Icon name='upload' color="white" fitted='true'/>
-                                </Button>
+                                <Form.Button size = 'medium' color = 'grey' content='Report Sighting' icon = {{name: 'upload', color: 'white'}}/>
+
                             </Grid.Column>
                         </Grid.Row>
                     </Grid>
+                        </Form.Group>
+                    </Form>
                 </fieldset>
 
                 <Grid padded='very' relaxed='very'>
