@@ -1,5 +1,5 @@
 import React, {Component} from 'react';
-import {Button, Form, Grid, Divider, Segment, Label, Icon, Dropdown, Menu, Card, Placeholder, Image} from 'semantic-ui-react'
+import {Button, Form, Grid, Divider, Segment, Label, Icon, Dropdown, Menu, Image, Message} from 'semantic-ui-react'
 import '../pageStyles/MainPage.css'
 import axios from 'axios';
 const GoogleImages = require('google-images');
@@ -17,6 +17,10 @@ class MainPage extends Component {
             modalIsOpen: false,
             popUp: false,
             popUp2: false,
+            popUpName: false,
+            popUpPerson: false,
+            popUpLocation: false,
+            popUpDate: false,
             toView: [],
             textBased: "",
             flowerInput: "Draperia",
@@ -26,7 +30,7 @@ class MainPage extends Component {
             dopt: [],
             visCrt: [],
             text:"",
-            url:"",
+            url:"https://s3.amazonaws.com/cdn0.brecks.com/images/500/71217.jpg",
             flower: "",
             submitFlower: "",
             person: "",
@@ -36,6 +40,10 @@ class MainPage extends Component {
             data: "",
             submitData: "",
             err: 2,
+            hasClickedTop: false,
+            gName: "",
+            sName: "",
+            cName: ""
         };
         this.onHomePress = this.onHomePress.bind(this);
 
@@ -43,10 +51,6 @@ class MainPage extends Component {
 
     onHomePress = () => {
         this.props.history.push('/homepage/' + this.props.getId);
-    };
-
-    onSubmit = () => {
-
     };
 
     onFlowerList = (name) => {
@@ -59,7 +63,6 @@ class MainPage extends Component {
                 console.log(res.data.rows[0]);
                 console.log(res.data.rows.length);
                 console.log(res.data.rows[0].name);
-                var b = [];
                 this.setState({r1: res.data.rows[0]});
                 for (let i = 0, v = res.data.rows.length; i < v; i++) {
                     console.log(res.data.rows[i]);
@@ -93,10 +96,6 @@ class MainPage extends Component {
             })
     };
 
-onComplete () {
-    //
-}
-
     handleCurrFlowers = () => {
     //USED TO ADD AND REMOVE FROM DROPDOWN *BASED ON BACKEND* do insertions and deletions there, NOT HERE
         for(var b = 0, len = this.state.flowersDB.length; b < len; b++){
@@ -115,24 +114,45 @@ onComplete () {
         };
 
 
-    onFlowerUpdate = () => {
-        //
-    };
-
-    onFlowerInsert = () => {
-        //
-    };
-
     componentDidMount() {
-
-        //this.onFlowerList(this);
-
-        ///////////
-        this.onAllFlowers(this); //RUN AGAIN EACH TIME A FLOWER IS ADDED ---- SO IT POPULATES IN DROP DONW
-        //////
-        /////
-
+        this.onFlowerList("Alpine columbine");
+        this.onAllFlowers(this); //RUN AGAIN EACH TIME A FLOWER IS ADDED ---- SO IT POPULATES IN DROP DONWs
     };
+
+
+    handleSubmitTop = () => {
+        const {gName,  sName, cName } = this.state;
+        //this.setState({ flowerSubmit: name, personSubmit: person, location: location, sighted : date });
+        var opt = [{genus: gName}, {species: sName}, {commonname: cName}];
+        axios.post('http://localhost:8000/api/flowers/update', {arr:opt},
+            {headers: {'Content-Type': 'application/json'}}
+        ).then(res => {
+            console.log(res.data.rows[0]["NAME"]);
+            this.setState({r1: res.data.rows[0]});
+            for (let i = 0, v = res.data.rows.length; i < v; i++) {
+                //console.log(res.data.rows[i]);
+                this.setState({flowersDB: this.state.flowersDB.concat(res.data.rows[i]["NAME"])}, () => console.log(this.state.flowersDB));
+            }
+            /*this.handleCurrFlowers(this);*/
+        })
+            .catch(err => {
+                console.log(err);
+            })
+    };
+
+    handleClickTop = () => {
+        console.log('dropdown clicked');
+        if(this.state.hasClickedTop === false){
+            this.setState({hasClickedTop: true});
+        }
+        else {
+            this.setState({hasClickedTop: false});
+        }
+    };
+    handleCloseTop = () =>{
+        this.setState({hasClickedTop: false});
+    };
+
     handleClick = () => {
         console.log('dropdown clicked');
         if(this.state.hasClicked2 === false){
@@ -144,6 +164,12 @@ onComplete () {
     };
     handleClose = () =>{
         this.setState({hasClicked2: false});
+    };
+
+
+    handleChangeTop = (e, {name, text}) => {
+        this.setState({[name]: text});
+        this.setState({text: text});
     };
 
 
@@ -168,7 +194,6 @@ onComplete () {
     };
 
     handleText = (e, { text }) => this.setState({ text });
-   // handleChange2 = (e, { name, value }) => this.setState({ [name]: value })
 
     handleSubmit = () => {
         const { name, person, location, date } = this.state;
@@ -188,46 +213,45 @@ onComplete () {
             .catch(err => {
                 console.log(err);
             })
-
     };
 
-    isValidDate = (dateString) => {
-        var regEx = /^\d{4}-\d{2}-\d{2}$/;
-        if(!dateString.match(regEx)) return false;
-        var d = new Date(dateString);
-        var dNum = d.getTime();
-        if(!dNum && dNum !== 0) return false;
-        return d.toISOString().slice(0,10) === dateString;
+    dateFormat = (isDate) => {
+        var r = /^\d{4}-\d{2}-\d{2}$/;
+        if(!isDate.match(r)) return false;
+        var d = new Date(isDate);
+        var dN = d.getTime();
+        if(!dN && dN !== 0) return false;
+        return d.toISOString().slice(0,10) === isDate;
     };
 
     handleSubmit2 = () => {
         console.log(this.state.flower);
-        /*if(this.isValidDate(this.state.data) === false){
-        this.setState({err2: "Invalid Date Format Entered"});
-            console.log('INvalid data');
+        if (this.state.popUpName === true || this.state.popUpPerson === true || this.state.popUpLocation === true || this.state.popUpDate === true) {
+            this.setState(({popUpName: false, popUpPerson: false , popUpLocation: false, popUpData: false}));
+        }
+        if (/[^a-zA-Z0-9\s_-]/.test(String(this.state.flower)) === true) {
+            this.setState({popUpFlower: true});
+            this.setState(({flower: "", person: "", location: "", data: ""}));
             return;
-        }*/
-
-
-
-
-        //run the add flower list here
-        /*
-
-        This.state.flower = flower name
-        this.state.person  = person name
-        this.state.location = location.name
-        this.state.data = location.date
-
-
-         */
-
-var info = [{name: String(this.state.flower)}, {person:String(this.state.person)}, {location: String(this.state.location)}, {sighted: String(this.state.data)}];
-console.log(info);
-console.log(JSON.stringify(info));
-let arrObj = [
-        {"name": String(this.state.flower)}, {"person":String(this.state.person)}, {"location": String(this.state.location)}, {"sighted": String(this.state.data)}
-    ];
+        }
+        if (/[^a-zA-Z\s-]/.test(String(this.state.person)) === true) {
+            this.setState({popUpPerson: true});
+            this.setState(({flower: "", person: "", location: "", data: ""}));
+            return;
+        }if (/[^a-zA-Z#0-9.\s-]/.test(String(this.state.location)) === true) {
+            this.setState({popUpLocation: true});
+            this.setState(({flower: "", person: "", location: "", data: ""}));
+            return;
+        }
+        if (this.dateFormat(this.state.data) === false) {
+            this.setState({popUpDate: true});
+            //console.log('Invalid Date Format was entered in user input');
+            this.setState(({flower: "", person: "", location: "", data: ""}));
+            return;
+        }
+        var info = [{name: String(this.state.flower)}, {person:String(this.state.person)}, {location: String(this.state.location)}, {sighted: String(this.state.data)}];
+        console.log(info);
+        console.log(JSON.stringify(info));
         axios.post('http://localhost:8000/api/flower/found', {name: String(this.state.flower), person: String(this.state.person), location: String(this.state.location), sighted: String(this.state.data)},
             {headers: {'Content-Type': 'application/json'}}
         ).then(res => {
@@ -255,8 +279,10 @@ let arrObj = [
     };
     handleChange2 = (e, {name, value}) => {
         this.setState({[name]: value});
-    };
+        this.setState(({popUpName: false, popUpPerson: false , popUpLocation: false, popUpData: false}));
 
+
+    };
 
     render() {
         const options = [
@@ -273,100 +299,96 @@ let arrObj = [
         return (
             <div className="box">
                 <fieldset>
-                    <Label color='grey'><b>Update A Flower's Information</b></Label>
+                    <Label color='grey'><Icon name = 'compose'/><b>Report a New Flower Sighting</b></Label>
                     <Divider/>
-                    <Grid columns={3}>
-                        <Grid.Row>
-                            <Grid.Column>
-                                <Menu inverted color='grey' className="menu" fluid>
-                                    <Menu.Menu className='menu' fluid floated = 'right'>
-                                        <Button.Group color='grey' className='groups' fluid>
-                                            <Dropdown
-                                                scrolling
-                                                searh = 'true'
-                                                button
-                                                simple
-                                                fluid
-                                                open={this.state.hasClicked2}
-                                                closeOnChange={true}
-                                                options={options}
-                                                trigger={trigger}
+
+                    <Form error onSubmit = {this.handleSubmitTop} >
+                        <Form.Group width = {16}>
+                            <Grid relaxed = 'very' columns={3} padded = 'horizontally' float= 'right'>
+
+                                <Grid.Row width = {16}>
+
+
+                                    <Grid.Column>
+                                        <Segment inverted color='teal' fluid>
+                                            <label><b>Flower Genus Name</b></label>
+                                            <Form.Input
+                                                required
+                                                placeholder = 'Carex'
+                                                name = 'flower'
+                                                value = {flower}
+                                                onChange = {this.handleChange2}
                                             />
-                                        </Button.Group>
-                                    </Menu.Menu>
-                                </Menu>
-                            </Grid.Column>
-                        </Grid.Row>
-                        <Grid.Row>
-                            <Grid.Column>
-                                <Segment inverted color='teal'>
-                                    <Form.Field className='emailInput'>
-                                        <label><b>Genus</b></label>
-                                        <Form>
-                                            <input
-                                                placeholder='ex: Carex '
-                                                autoComplete="off"
+                                            {this.state.popUpFlower === true &&
+                                            <Message
+                                                error
+                                                header='ERROR!'
+                                                content='You entered an invalid format for flower genus name!'
                                             />
-                                        </Form>
-                                    </Form.Field>
-                                </Segment>
-                            </Grid.Column>
-                            <Grid.Column>
-                                <Segment inverted color='teal'>
-                                    <Form.Field className='emailInput'>
-                                        <label><b>Species</b></label>
-                                        <Form>
-                                            <input
-                                                placeholder='ex: Limosa '
-                                                autoComplete="off"
+                                            }
+                                        </Segment>
+                                    </Grid.Column>
+                                    <Grid.Column>
+                                        <Segment inverted color='teal' fluid>
+                                            <label><b>Flower Species Name</b></label>
+                                            <Form.Input
+                                                required
+                                                placeholder = 'ex: limosa'
+                                                name ='person'
+                                                value = {this.state.person}
+                                                onChange = {this.handleChangeTop}
                                             />
-                                        </Form>
-                                    </Form.Field>
-                                </Segment>
-                            </Grid.Column>
-                            <Grid.Column>
-                                <Segment inverted color='teal'>
-                                    <Form.Field className='emailInput'>
-                                        <label><b>Common Name</b></label>
-                                        <Form>
-                                            <input
-                                                placeholder='ex: Mud sedge '
-                                                autoComplete="off"
+                                            {this.state.popUpPerson === true &&
+                                            <Message
+                                                error
+                                                header='ERROR!'
+                                                content='You entered an invalid format for the species name!'
                                             />
-                                        </Form>
-                                    </Form.Field>
-                                </Segment>
-                            </Grid.Column>
-                        </Grid.Row>
-                        <Grid.Row>
-                            <Grid.Column floated="left">
-                                <Label style={{margin: '10px'}} size="big" floated="left">
-                                    <Icon name='users'/>{this.state.numObservations}
-                                </Label>
-                            </Grid.Column>
-                            <Grid.Column verticalAlign="center">
-                                {this.state.popUp === true &&
-                                <Button size='medium' color='yellow' onClick={this.closeModal} toggle={!this.popUp}>
-                                    <Icon name='remove' color="black"/><b className="text">Warning: Flower not found</b>
-                                </Button>
-                                }
-                            </Grid.Column>
-                            <Grid.Column verticalAlign="center">
-                                <Button color='grey' fluid size="medium" icon labelPosition='right'
-                                    /*onClick={this.addDataSet.bind(this)}*/>
-                                    Update Flower
-                                    <Icon name='upload' color="white" fitted='true'/>
-                                </Button>
-                            </Grid.Column>
-                        </Grid.Row>
-                    </Grid>
+                                            }
+                                        </Segment>
+                                    </Grid.Column>
+                                    <Grid.Column>
+                                        <Segment inverted color='teal' fluid>
+                                            <label><b>Flower Common Name</b></label>
+                                            <Form.Input
+                                                required
+                                                placeholder = 'ex: Mud sedge'
+                                                name = 'data'
+                                                value = {this.state.data}
+                                                onChange = {this.handleChangeTop}
+                                            />
+                                            {this.state.popUpCommon === true &&
+                                            <Message
+                                                error
+                                                header='ERROR!'
+                                                content='You entered an invalid format for the common name.'
+                                            />
+                                            }
+                                        </Segment>
+                                    </Grid.Column>
+
+
+                                </Grid.Row>
+
+                                <Grid.Row>
+                                    <Grid.Column floated="left">
+                                    </Grid.Column>
+                                    <Grid.Column verticalAlign="center">
+                                    </Grid.Column>
+                                    <Grid.Column verticalAlign="center">
+                                        <Form.Button size = 'medium' color = 'grey' content='Report Sighting' icon = {{name: 'upload', color: 'white'}} onClick = {this.closePopUp2}/>
+                                    </Grid.Column>
+                                </Grid.Row>
+                            </Grid>
+                        </Form.Group>
+                    </Form>
                 </fieldset>
 
                 <fieldset>
                     <Label color='grey'><Icon name = 'compose'/><b>Report a New Flower Sighting</b></Label>
                     <Divider/>
 
-                    <Form onSubmit = {this.handleSubmit2} >
+                    <Form error onSubmit = {this.handleSubmit2} >
                         <Form.Group width = {16}>
                     <Grid relaxed = 'very' columns={4} padded = 'horizontally' float= 'right'>
 
@@ -383,6 +405,14 @@ let arrObj = [
                                         value = {flower}
                                         onChange = {this.handleChange2}
                                     />
+                                    {this.state.popUpFlower === true &&
+                                    <Message
+                                        error
+                                        header='ERROR!'
+                                        content='You entered an invalid format for flower name!
+                                        Flower names must contain only alphanumeric characters!'
+                                        />
+                                    }
                                 </Segment>
                             </Grid.Column>
                             <Grid.Column>
@@ -395,6 +425,13 @@ let arrObj = [
                                         value = {this.state.person}
                                         onChange = {this.handleChange2}
                                     />
+                                    {this.state.popUpPerson === true &&
+                                    <Message
+                                        error
+                                        header='ERROR!'
+                                        content='You entered an invalid format for person name! Person names must contain only alphabetical characters!'
+                                    />
+                                    }
                                 </Segment>
                             </Grid.Column>
                             <Grid.Column>
@@ -407,6 +444,13 @@ let arrObj = [
                                         value = {this.state.location}
                                         onChange = {this.handleChange2}
                                     />
+                                    {this.state.popUpLocation === true &&
+                                    <Message
+                                        error
+                                        header='ERROR!'
+                                        content='You entered an invalid format for location (ex: 1)'
+                                    />
+                                    }
                                 </Segment>
                             </Grid.Column>
                             <Grid.Column>
@@ -419,6 +463,13 @@ let arrObj = [
                                         value = {this.state.data}
                                         onChange = {this.handleChange2}
                                     />
+                                    {this.state.popUpComName === true &&
+                                    <Message
+                                        error
+                                        header='ERROR!'
+                                        content='You entered an invalid format for date (ex: 07-28x7-@3)'
+                                    />
+                                    }
                                 </Segment>
                             </Grid.Column>
 
@@ -429,14 +480,9 @@ let arrObj = [
                             <Grid.Column floated="left">
                             </Grid.Column>
                             <Grid.Column verticalAlign="center">
-                                {this.state.popUp2 === true &&
-                                <Button size='medium' color='yellow' onClick={this.closeModal} toggle={!this.popUp2}>
-                                    <Icon name='remove' color="black"/><b className="text">{this.state.err2}</b>
-                                </Button>
-                                }
                             </Grid.Column>
                             <Grid.Column verticalAlign="center">
-                                <Form.Button size = 'medium' color = 'grey' content='Report Sighting' icon = {{name: 'upload', color: 'white'}}/>
+                                <Form.Button size = 'medium' color = 'grey' content='Report Sighting' icon = {{name: 'upload', color: 'white'}} onClick = {this.closePopUp2}/>
                             </Grid.Column>
                         </Grid.Row>
                     </Grid>

@@ -38,7 +38,6 @@ let db = new sqlite3.Database('flowers2019.db', (err) => {
         );
 
        //SQLITE TRIGGER: Handles user update:
-
         db.run(
             `CREATE TRIGGER IF NOT EXISTS validate_ BEFORE 
         INSERT ON SIGHTINGS
@@ -54,7 +53,7 @@ let db = new sqlite3.Database('flowers2019.db', (err) => {
                 if (err) {
                     console.log(err);
                 } else {
-                    console.log('Trigger is available for sightings');
+                    //console.log('Trigger is available for sightings');
                 }
             }
         );
@@ -131,7 +130,7 @@ END;
                 if (err) {
                     console.log(err);
                 } else {
-                    console.log('Trigger is available for to log Features Table');
+                    console.log('Trigger is available for to log updates/insertions/deletions Features Table');
                 }
             }
         );

@@ -135,8 +135,10 @@ app.get("/api/flowers/db", (req, res, next) => {
     //does not take user input, thus protection for SQL injection.
     /*var name = req.body.name;*/
     let sql = "select DISTINCT (NAME) from 'sightings'";
+/*
     let params = [name];
-    db.all(sql, name, (err, rows) => {
+*/
+    db.all(sql, (err, rows) => {
         if (err) {
             res.status(400).json({"error": err.message});
             return;
@@ -197,9 +199,8 @@ app.patch("/api/flowers/update", (req, res, next) => {
             `UPDATE flowers set 
            genus = coalesce(?,genus),
            species = COALESCE(?,species), 
-           comname = coalesce(?,comname) 
-           WHERE comname = ?`,
-        [data.genus, data.species, data.comName, req.params.comName],
+           comname = coalesce(?,comname)`,
+        [data.genus, data.species, data.comName],
         (err, result) => {
             if (err) {
                 res.status(400).json({"error": res.message});

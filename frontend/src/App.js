@@ -1,6 +1,5 @@
 import React from 'react';
 import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
-import HomePage from './pages/HomePage'
 import LoginPage from './pages/LoginPage'
 import MainPage from './pages/MainPage'
 import Header from './components/Header'
@@ -27,9 +26,6 @@ function App() {
         return params[params.length - 1]
     }
 
-
-    //add user ID BACK TO ROUTES
-
     return (
         <Router>
             <div className='container'>
@@ -38,7 +34,6 @@ function App() {
 
                     <Switch>
                         <Route exact path="/loginpage/" render={(props) => <LoginPage {...props} getId={getIdFromUrl()} />}/>
-                        <Route exact path="/homepage/" render={(props) => <HomePage {...props} getId={getIdFromUrl()} />}/>
                         <Route exact path="/mainpage/" render={(props) => <MainPage {...props} getId={getIdFromUrl()} />}/>
                     </Switch>
 
