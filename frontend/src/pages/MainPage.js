@@ -121,7 +121,7 @@ class MainPage extends Component {
 
 
     handleSubmitTop = () => {
-        const {gName,  sName, cName } = this.state;
+        const {gName, sName, cName } = this.state;
         //this.setState({ flowerSubmit: name, personSubmit: person, location: location, sighted : date });
         var opt = [{genus: gName}, {species: sName}, {commonname: cName}];
         axios.post('http://localhost:8000/api/flowers/update', {arr:opt},
@@ -316,10 +316,10 @@ class MainPage extends Component {
                                                 required
                                                 placeholder = 'Carex'
                                                 name = 'flower'
-                                                value = {flower}
+                                                value = {this.state.gName}
                                                 onChange = {this.handleChange2}
                                             />
-                                            {this.state.popUpFlower === true &&
+                                            {this.state.popUpgName === true &&
                                             <Message
                                                 error
                                                 header='ERROR!'
@@ -335,10 +335,10 @@ class MainPage extends Component {
                                                 required
                                                 placeholder = 'ex: limosa'
                                                 name ='person'
-                                                value = {this.state.person}
+                                                value = {this.state.sName}
                                                 onChange = {this.handleChangeTop}
                                             />
-                                            {this.state.popUpPerson === true &&
+                                            {this.state.popUpSname === true &&
                                             <Message
                                                 error
                                                 header='ERROR!'
@@ -354,10 +354,10 @@ class MainPage extends Component {
                                                 required
                                                 placeholder = 'ex: Mud sedge'
                                                 name = 'data'
-                                                value = {this.state.data}
+                                                value = {this.state.cName}
                                                 onChange = {this.handleChangeTop}
                                             />
-                                            {this.state.popUpCommon === true &&
+                                            {this.state.popUpCommonN === true &&
                                             <Message
                                                 error
                                                 header='ERROR!'
