@@ -16,6 +16,7 @@ class MainPage extends Component {
             hasClicked2: false,
             modalIsOpen: false,
             popUp: false,
+            popUp2: false,
             toView: [],
             textBased: "",
             flowerInput: "Draperia",
@@ -33,7 +34,8 @@ class MainPage extends Component {
             location: "",
             submitLocation: "",
             data: "",
-            submitData: ""
+            submitData: "",
+            err: 2,
         };
         this.onHomePress = this.onHomePress.bind(this);
 
@@ -189,8 +191,25 @@ onComplete () {
 
     };
 
+    isValidDate = (dateString) => {
+        var regEx = /^\d{4}-\d{2}-\d{2}$/;
+        if(!dateString.match(regEx)) return false;
+        var d = new Date(dateString);
+        var dNum = d.getTime();
+        if(!dNum && dNum !== 0) return false;
+        return d.toISOString().slice(0,10) === dateString;
+    };
+
     handleSubmit2 = () => {
         console.log(this.state.flower);
+        /*if(this.isValidDate(this.state.data) === false){
+        this.setState({err2: "Invalid Date Format Entered"});
+            console.log('INvalid data');
+            return;
+        }*/
+
+
+
 
         //run the add flower list here
         /*
@@ -212,6 +231,9 @@ let arrObj = [
         axios.post('http://localhost:8000/api/flower/found', {name: String(this.state.flower), person: String(this.state.person), location: String(this.state.location), sighted: String(this.state.data)},
             {headers: {'Content-Type': 'application/json'}}
         ).then(res => {
+            if (res.status === 400){
+            console.log('se');
+                }
             console.log(res);
             console.log(res.data.rows[0]["NAME"]);
             this.setState({r1: res.data.rows[0]});
@@ -222,7 +244,9 @@ let arrObj = [
             this.handleCurrFlowers(this);
         })
             .catch(err => {
-                console.log(err);
+                this.setState({popUp2: true});
+                this.setState({err2: String('Error: Improper inputs entered')});
+                console.log(err.json);
             });
 
         this.setState(({flower: "", person: "", location: "" , data: ""}));
@@ -400,19 +424,19 @@ let arrObj = [
 
 
                         </Grid.Row>
+
                         <Grid.Row>
                             <Grid.Column floated="left">
                             </Grid.Column>
                             <Grid.Column verticalAlign="center">
-                                {this.state.popUp === true &&
-                                <Button size='medium' color='yellow' onClick={this.closeModal} toggle={!this.popUp}>
-                                    <Icon name='remove' color="black"/><b className="text">Warning: Flower not found</b>
+                                {this.state.popUp2 === true &&
+                                <Button size='medium' color='yellow' onClick={this.closeModal} toggle={!this.popUp2}>
+                                    <Icon name='remove' color="black"/><b className="text">{this.state.err2}</b>
                                 </Button>
                                 }
                             </Grid.Column>
                             <Grid.Column verticalAlign="center">
                                 <Form.Button size = 'medium' color = 'grey' content='Report Sighting' icon = {{name: 'upload', color: 'white'}}/>
-
                             </Grid.Column>
                         </Grid.Row>
                     </Grid>
@@ -449,7 +473,6 @@ let arrObj = [
                                 </Grid.Column>
                             </Grid.Row>
                             <Divider />
-
                             <Grid.Row floated='right'>
                                 <Grid celled floated='right' padded='horizontally'>
                                     <Grid.Row color='grey'>
@@ -459,7 +482,6 @@ let arrObj = [
                                         </Grid.Column>
                                         }
                                     </Grid.Row>
-
                                     {this.state.flowerSightings.length !== 0 &&
                                     <Grid.Row color = 'teal'>
                                         <Grid.Column width={4} textAlign = 'center'>

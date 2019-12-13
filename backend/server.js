@@ -135,7 +135,7 @@ app.get("/api/flowers/db", (req, res, next) => {
     //does not take user input, thus protection for SQL injection.
     /*var name = req.body.name;*/
     let sql = "select DISTINCT (NAME) from 'sightings'";
-    //let params = [name];
+    let params = [name];
     db.all(sql, name, (err, rows) => {
         if (err) {
             res.status(400).json({"error": err.message});
@@ -277,9 +277,12 @@ app.post("/api/flower/found", (req, res, next) => {
     var params = [data.name, data.person, data.location, data.sighted];
     db.run(sql, params, function (err, result) {
         if (err) {
-            res.status(400).json({"error": err.message});
+            res.status(400).send(err.message);
+            //res.status(400).send( err.message);
+            console.log(err.message);
             console.timeEnd('sighting');
             console.log(data);
+            //console.log(result);
             return;
         }
         res.json({
